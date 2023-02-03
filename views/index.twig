@@ -1,0 +1,262 @@
+<style>
+body {
+	background: #fff;
+	color: #333;
+	background-color:#e4e4e4;
+}
+
+.container {
+	display: block;
+	width: 400px;
+	margin: 10px auto 100px;
+	background-color:#fff;
+	padding:0px 10px 10px 10px;
+	border-radius:10px
+}
+
+h2 {
+	text-align:center;
+	padding-top:10px;
+	margin-bottom:0px;
+}
+
+ul {
+	margin: 0;
+	padding: 0;
+}
+
+li * {
+	float: left;
+}
+
+li,
+h3 {
+	clear: both;
+	list-style: none;
+}
+
+input,
+button {
+	outline: none;
+}
+
+button, .save, .cancel {
+	background: none;
+	border: 0px;
+	color: #888;
+	font-size: 20px;
+	width: 60px;
+	margin: 2px 0 0;
+    font-size : 15px;
+	font-family: Lato, sans-serif;
+	cursor: pointer;
+}
+
+h3,
+label[for='new-task'] {
+	color: #333;
+	font-weight: 700;
+	font-size: 15px;
+	padding: 20px 0 10px;
+	margin: 0;
+	text-transform: uppercase;
+}
+
+input[type="text"] {
+	font-size: 20px;
+	line-height: 18px;
+	height: 18px;
+	padding: 15px;
+	border: 1px solid #ddd;
+	background: #fff;
+	border-radius: 6px;
+	font-family: Lato, sans-serif;
+	color: #888;
+}
+
+input[type="text"]:focus {
+	color: #333;
+}
+
+
+label[for='new-task'] {
+	display: block;
+	margin: 0 0 20px;
+}
+
+input#new-task {
+	float: left;
+	width: 318px;
+}
+
+p > button:hover {
+	color: green;
+}
+
+li {
+	overflow: hidden;
+	padding: 15px 0;
+    font-size : 20px;
+	border-bottom: 1px solid #eee;
+}
+
+li > input[type="text"] {
+	width: 226px;
+}
+
+.delete, .update, .save, .cancel{
+  position : relative;
+  float:right;
+}
+button > a{
+  font-size : 15px;
+  text-decoration: none;
+  color : black
+}
+.delete > a:hover{
+  color : red;
+}
+.update:hover{
+  color : blue;
+}
+.save:hover{
+  color : green;
+}
+.search{
+	margin-top: 15px;
+}
+.container1{
+	display : flex;
+	border-bottom: 2px solid #333;
+}
+
+.up > a{
+	color : #888
+}
+.down > a{
+	color : #888
+}
+
+.popup-overlay {
+  /*Hides pop-up when there is no "active" class*/
+  visibility: hidden;
+  position: absolute;
+  background: #ffffff;
+  border: 3px solid #666666;
+  width: 30%;
+  height: 20%;
+  left: 42%;
+  top: 40%;
+}
+
+.popup-overlay.active {
+  visibility: visible;
+  text-align: center;
+}
+
+.popup-content {
+  visibility: hidden;
+}
+
+.popup-content.active {
+  visibility: visible;
+}
+
+
+
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/js/all.min.js" integrity="sha512-naukR7I+Nk6gp7p5TMA4ycgfxaZBJ7MO5iC3Fp6ySQyKFHOGfpkSZkYVWV5R7u7cfAicxanwYQ5D1e17EfJcMA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.3/jquery.min.js" integrity="sha512-STof4xm1wgkfm7heWqFJVn58Hm3EtS31XFaagaa8VMReCXAkQnJZ+jEy8PCC/iT18dFy95WcExNHFTqLyp72eQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<body>
+	<div class="container">
+		<h2>TODO LIST</h2>
+		<h3>Add Item</h3>		   
+    <form action="/list" method="post">
+		<p>
+			<input name="name" id="new-task" type="text"><button onclick="return CheckValidation()">Add</button>
+		</p>
+    </form>
+	<div class="container1">
+		<h3>Todo</h3>
+		 <button class="up"><a href = "/up"><i class="fa-solid fa-arrow-up"></i></a></button>
+		 <button class="down"><a href = "/down"><i class="fa-solid fa-arrow-down"></i></a></button>
+    </div>
+    <form action="/searchItem" method="post">
+		<input type="text" id="search" class="search" name="search" placeholder = "Search" />
+		<button>Search</button>
+    </form>
+{{data.updatedAt}} &nbsp; &nbsp; &nbsp; &nbsp;
+{# <button id= {{data.id}} onclick="popUp('{{data.id}}')"> </button>   #}
+		<ul id="incomplete-tasks">
+      {% for data in datas %}
+      <li id= {{data.id}}> {{data.updatedAt}} &nbsp; &nbsp; &nbsp; &nbsp;   {{data.name}} <button class="update" onclick="editButton('{{data.id}}', '{{data.name}}')">Edit</button> 
+      <button class="delete"><a href = "/delete/{{data.id}}"> Done </a> </button> </li> 
+      {% endfor %}
+		</ul>
+		{# <div class="popup-overlay">
+        <textarea id="" name="" rows="7" autofocus cols="52" class="popup-content">
+	    </textarea>
+	  <button class="close">Close</button> </div> #}
+</body>
+
+<script>
+function CheckValidation(){
+
+const textEmpty = document.getElementById("new-task").value;
+if(textEmpty == null || textEmpty == "") {
+	alert("Please Enter Value");
+	return false;
+} 
+   return true;
+}
+      function editButton(id, name){
+        $("#incomplete-tasks > #"+id).each(function(){
+        let input = $(`<input type="text" id="input${id}"/>`);
+        input.val(name);
+        $(this).html(input);
+      });
+        let r = $('<input/>').attr({
+            type: 'button',
+            value: "Save",
+            class : 'save',
+            id : 'updateData',
+            onclick: `updateButton(${id})`
+        });
+        $("#incomplete-tasks > #"+id).append(r);
+        let s = $('<input/>').attr({
+            type: 'button',
+            value: "Cancel",
+            class : 'cancel',
+            id : 'cancelData',
+            onclick: "cancelButton()"
+        });
+        $("#incomplete-tasks > #"+id).append(s);
+  };
+
+ function updateButton(id){
+    let req1 = $.ajax({
+      type : "PATCH",
+      url: `/update/${id}`,
+      data: {
+        name: $(`#input${id}`).val(),
+      },
+    });
+	req1.done(function(){
+        location.reload(true);
+    })
+ }
+
+ function cancelButton(){
+  location.reload();
+ }
+
+ {# function popUp(id){
+	$('#'+id).each(function(){
+    $(".popup-overlay, .popup-content").addClass("active");
+	})
+ }
+ $(".close, .popup-overlay").on("click", function() {
+  $(".popup-overlay, .popup-content").removeClass("active");
+}); #}
+
+</script>
